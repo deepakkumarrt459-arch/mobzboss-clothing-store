@@ -6,6 +6,7 @@ export interface Product {
   description: string
   image: string
   badge?: string
+  rating?: number
 }
 
 export const products: Product[] = [
@@ -17,6 +18,7 @@ export const products: Product[] = [
     description: 'Structured matte shell with tailored shoulders and luxe hardware details.',
     image: 'https://placehold.co/400x500/111111/F5F5F5?text=Commander+Jacket',
     badge: 'Best Seller',
+    rating: 4.8,
   },
   {
     id: 'mbs-002',
@@ -25,6 +27,7 @@ export const products: Product[] = [
     price: '$520',
     description: 'Longline silhouette in premium leather with warm gold accents.',
     image: 'https://placehold.co/400x500/2B2B2B/F5F5F5?text=Leather+Trench',
+    rating: 4.7,
   },
   {
     id: 'mbs-003',
@@ -33,6 +36,7 @@ export const products: Product[] = [
     price: '$95',
     description: 'Soft cotton tee with subtle vintage branding and an elevated fit.',
     image: 'https://placehold.co/400x500/111111/F5F5F5?text=Gold+Logo+Tee',
+    rating: 4.4,
   },
   {
     id: 'mbs-004',
@@ -41,6 +45,7 @@ export const products: Product[] = [
     price: '$220',
     description: 'Refined cargo construction with premium stitch detail and tapered lines.',
     image: 'https://placehold.co/400x500/2B2B2B/F5F5F5?text=Cargo+Pants',
+    rating: 4.5,
   },
   {
     id: 'mbs-005',
@@ -49,6 +54,7 @@ export const products: Product[] = [
     price: '$180',
     description: 'Sculpted fit and plush knit for effortless layering and edge.',
     image: 'https://placehold.co/400x500/111111/F5F5F5?text=Knit+Hoodie',
+    rating: 4.6,
   },
   {
     id: 'mbs-006',
@@ -57,6 +63,7 @@ export const products: Product[] = [
     price: '$185',
     description: 'Crisp twill with vintage-inspired details and a relaxed drape.',
     image: 'https://placehold.co/400x500/2B2B2B/F5F5F5?text=Twill+Shirt',
+    rating: 4.3,
   },
   {
     id: 'mbs-007',
@@ -65,6 +72,7 @@ export const products: Product[] = [
     price: '$210',
     description: 'Premium denim with structured tailoring and a clean finish.',
     image: 'https://placehold.co/400x500/111111/F5F5F5?text=Tailored+Denim',
+    rating: 4.2,
   },
   {
     id: 'mbs-008',
@@ -73,6 +81,7 @@ export const products: Product[] = [
     price: '$340',
     description: 'Timeless bomber form with tactile fabric and luxury trimming.',
     image: 'https://placehold.co/400x500/2B2B2B/F5F5F5?text=Heritage+Bomber',
+    rating: 4.6,
   },
   {
     id: 'mbs-009',
@@ -81,6 +90,7 @@ export const products: Product[] = [
     price: '$390',
     description: 'Sharp silhouette with a vintage-inspired pattern and soft tailoring.',
     image: 'https://placehold.co/400x500/111111/F5F5F5?text=Structured+Blazer',
+    rating: 4.7,
   },
   {
     id: 'mbs-010',
@@ -89,6 +99,7 @@ export const products: Product[] = [
     price: '$270',
     description: 'Utility-forward layering piece with premium finishing and fit.',
     image: 'https://placehold.co/400x500/2B2B2B/F5F5F5?text=Chore+Coat',
+    rating: 4.1,
   },
   {
     id: 'mbs-011',
@@ -97,6 +108,7 @@ export const products: Product[] = [
     price: '$160',
     description: 'Refined athletic-inspired shorts in soft leather with streamlined details.',
     image: 'https://placehold.co/400x500/111111/F5F5F5?text=Track+Shorts',
+    rating: 4.0,
   },
   {
     id: 'mbs-012',
@@ -105,5 +117,6 @@ export const products: Product[] = [
     price: '$65',
     description: 'A minimal winter staple with a vintage textured knit and luxe finish.',
     image: 'https://placehold.co/400x500/2B2B2B/F5F5F5?text=Premium+Beanie',
+    rating: 4.2,
   },
 ]
