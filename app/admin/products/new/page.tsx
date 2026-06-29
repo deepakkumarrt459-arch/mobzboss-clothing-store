@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import ProductForm, { type ProductFormPayload } from '@/components/admin/ProductForm'
 import { useRouter } from 'next/navigation'
-import { addProduct, uploadProductImage, updateProduct } from '@/services/productService'
+import { addProduct } from '@/services/productService'
 
 export default function NewProductPage() {
   const router = useRouter()
@@ -13,7 +13,7 @@ export default function NewProductPage() {
     setLoading(true)
 
     try {
-      const productId = await addProduct({
+      await addProduct({
         name: payload.name,
         description: payload.description,
         price: Number(payload.price.replace(/[^0-9.]/g, '')) || 0,
@@ -27,15 +27,10 @@ export default function NewProductPage() {
           .map((color) => color.trim())
           .filter(Boolean),
         stock: Number(payload.stock) || 0,
-        images: [],
+        images: [`/products/${payload.image.trim()}`],
         featured: false,
         rating: 0,
       })
-
-      if (payload.imageFile) {
-        const imageUrl = await uploadProductImage(payload.imageFile, productId)
-        await updateProduct(productId, { images: [imageUrl] })
-      }
 
       router.push('/admin/products')
     } catch (error) {

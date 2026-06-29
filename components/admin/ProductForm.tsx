@@ -12,7 +12,7 @@ export type ProductFormPayload = {
   sizes: string
   colors: string
   stock: string
-  imageFile: File | null
+  image: string
 }
 
 type Props = {
@@ -28,14 +28,13 @@ export default function ProductForm({ onSubmit, disabled = false }: Props) {
   const [sizes, setSizes] = useState('S,M,L')
   const [colors, setColors] = useState('Black')
   const [stock, setStock] = useState('0')
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imageLabel, setImageLabel] = useState('No file selected')
+  const [image, setImage] = useState('')
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    if (!name.trim() || !price.trim() || !description.trim()) {
-      alert('Please fill in name, price, and description.')
+    if (!name.trim() || !price.trim() || !description.trim() || !image.trim()) {
+      alert('Please fill in name, price, description, and image filename.')
       return
     }
 
@@ -47,14 +46,8 @@ export default function ProductForm({ onSubmit, disabled = false }: Props) {
       sizes,
       colors,
       stock,
-      imageFile,
+      image: image.trim(),
     })
-  }
-
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0] ?? null
-    setImageFile(file)
-    setImageLabel(file?.name ?? 'No file selected')
   }
 
   return (
@@ -83,14 +76,14 @@ export default function ProductForm({ onSubmit, disabled = false }: Props) {
       <Input placeholder="Sizes (comma separated)" value={sizes} onChange={(e) => setSizes(e.target.value)} disabled={disabled} />
       <Input placeholder="Colors (comma separated)" value={colors} onChange={(e) => setColors(e.target.value)} disabled={disabled} />
       <Input placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} disabled={disabled} />
+      <Input
+        placeholder="Image filename (e.g. ferari.jpeg)"
+        value={image}
+        onChange={(e) => setImage(e.target.value)}
+        disabled={disabled}
+      />
 
       <div className="flex flex-col gap-3">
-        <label className="inline-flex items-center justify-between rounded-md bg-[#1A1A1A] px-4 py-3 text-sm text-[#F5F5F5]">
-          <span>Upload Image</span>
-          <span className="text-xs text-[#D9D0A7]">{imageLabel}</span>
-          <input type="file" accept="image/*" className="sr-only" onChange={handleFileChange} disabled={disabled} />
-        </label>
-
         <Button type="submit" disabled={disabled}>
           {disabled ? 'Publishing…' : 'Publish Product'}
         </Button>
