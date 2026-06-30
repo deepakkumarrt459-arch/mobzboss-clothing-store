@@ -2,14 +2,15 @@
 export interface Product {
   id: string
   name: string
-  description: string
   price: number
   category: string
-  sizes: string[]
-  colors: string[]
-  stock: number
-  images: string[]
-  featured: boolean
-  rating: number
-  createdAt: Date
+  // Optional fields — code should handle missing values safely
+  description?: string
+  sizes?: string[]
+  colors?: string[]
+  stock?: number
+  images?: string[]
+  featured?: boolean
+  rating?: number
+  createdAt?: Date
 }

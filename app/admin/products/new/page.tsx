@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from 'react'
 import ProductForm, { type ProductFormPayload } from '@/components/admin/ProductForm'
@@ -16,20 +16,14 @@ export default function NewProductPage() {
       await addProduct({
         name: payload.name,
         description: payload.description,
-        price: Number(payload.price.replace(/[^0-9.]/g, '')) || 0,
+        price: payload.price,
         category: payload.category,
-        sizes: payload.sizes
-          .split(',')
-          .map((size) => size.trim())
-          .filter(Boolean),
-        colors: payload.colors
-          .split(',')
-          .map((color) => color.trim())
-          .filter(Boolean),
-        stock: Number(payload.stock) || 0,
+        sizes: payload.sizes,
+        colors: payload.colors,
+        stock: payload.stock,
         images: [`/products/${payload.image.trim()}`],
         featured: false,
-        rating: 0,
+        rating: payload.rating,
       })
 
       router.push('/admin/products')

@@ -1,34 +1,57 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 
 export type ProductFormPayload = {
   name: string
-  price: string
+  price: number
   category: string
   description: string
-  sizes: string
-  colors: string
-  stock: string
+  sizes: string[]
+  colors: string[]
+  stock: number
+  rating: number
   image: string
 }
 
 type Props = {
   onSubmit?: (payload: ProductFormPayload) => Promise<void> | void
   disabled?: boolean
+  initialValues?: ProductFormPayload
+  submitLabel?: string
 }
 
-export default function ProductForm({ onSubmit, disabled = false }: Props) {
-  const [name, setName] = useState('')
-  const [price, setPrice] = useState('')
-  const [category, setCategory] = useState('Tops')
-  const [description, setDescription] = useState('')
-  const [sizes, setSizes] = useState('S,M,L')
-  const [colors, setColors] = useState('Black')
-  const [stock, setStock] = useState('0')
-  const [image, setImage] = useState('')
+const DEFAULT_SIZES = ['S', 'M', 'L', 'XL']
+const DEFAULT_COLORS = ['Black', 'White']
+const DEFAULT_RATING = 4
+const DEFAULT_STOCK = 10
+
+export default function ProductForm({ onSubmit, disabled = false, initialValues, submitLabel }: Props) {
+  const [name, setName] = useState(initialValues?.name ?? '')
+  const [price, setPrice] = useState(initialValues?.price ? String(initialValues.price) : '')
+  const [category, setCategory] = useState(initialValues?.category ?? 'Tops')
+  const [description, setDescription] = useState(initialValues?.description ?? '')
+  const [sizes, setSizes] = useState(initialValues?.sizes?.join(',') ?? DEFAULT_SIZES.join(','))
+  const [colors, setColors] = useState(initialValues?.colors?.join(',') ?? DEFAULT_COLORS.join(','))
+  const [stock, setStock] = useState(initialValues?.stock ? String(initialValues.stock) : String(DEFAULT_STOCK))
+  const [rating, setRating] = useState(initialValues?.rating ? String(initialValues.rating) : String(DEFAULT_RATING))
+  const [image, setImage] = useState(initialValues?.image ?? '')
+
+  useEffect(() => {
+    if (!initialValues) return
+
+    setName(initialValues.name)
+    setPrice(String(initialValues.price))
+    setCategory(initialValues.category)
+    setDescription(initialValues.description)
+    setSizes(initialValues.sizes.join(','))
+    setColors(initialValues.colors.join(','))
+    setStock(String(initialValues.stock))
+    setRating(String(initialValues.rating))
+    setImage(initialValues.image)
+  }, [initialValues])
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -38,16 +61,29 @@ export default function ProductForm({ onSubmit, disabled = false }: Props) {
       return
     }
 
-    await onSubmit?.({
+    const parsedSizes = sizes
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+
+    const parsedColors = colors
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean)
+
+    const payload: ProductFormPayload = {
       name: name.trim(),
-      price: price.trim(),
+      price: Number(price.toString().replace(/[^0-9.]/g, '')) || 0,
       category,
       description: description.trim(),
-      sizes,
-      colors,
-      stock,
+      sizes: parsedSizes.length ? parsedSizes : DEFAULT_SIZES,
+      colors: parsedColors.length ? parsedColors : DEFAULT_COLORS,
+      stock: Number(stock) || DEFAULT_STOCK,
+      rating: Number(rating) || DEFAULT_RATING,
       image: image.trim(),
-    })
+    }
+
+    await onSubmit?.(payload)
   }
 
   return (
@@ -75,6 +111,7 @@ export default function ProductForm({ onSubmit, disabled = false }: Props) {
       />
       <Input placeholder="Sizes (comma separated)" value={sizes} onChange={(e) => setSizes(e.target.value)} disabled={disabled} />
       <Input placeholder="Colors (comma separated)" value={colors} onChange={(e) => setColors(e.target.value)} disabled={disabled} />
+      <Input placeholder="Rating (number)" value={rating} onChange={(e) => setRating(e.target.value)} disabled={disabled} />
       <Input placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} disabled={disabled} />
       <Input
         placeholder="Image filename (e.g. ferari.jpeg)"

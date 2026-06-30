@@ -5,11 +5,6 @@ import { getStorage, type FirebaseStorage } from 'firebase/storage'
 
 const isBrowser = typeof window !== 'undefined'
 
-console.log("API KEY =", process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
-console.log("PROJECT =", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)
-
-// Load Firebase configuration from environment variables provided in .env.local.
-// These values are intentionally not hardcoded and should be managed securely.
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -19,21 +14,16 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
 
-let app: FirebaseApp
-let auth: Auth
-let db: Firestore
-let storage: FirebaseStorage
+let app: FirebaseApp | undefined
+let auth: Auth | undefined
+let db: Firestore | undefined
+let storage: FirebaseStorage | undefined
 
 if (isBrowser) {
   app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig)
   auth = getAuth(app)
   db = getFirestore(app)
   storage = getStorage(app)
-} else {
-  app = undefined as unknown as FirebaseApp
-  auth = undefined as unknown as Auth
-  db = undefined as unknown as Firestore
-  storage = undefined as unknown as FirebaseStorage
 }
 
 export { app, auth, db, storage, isBrowser }

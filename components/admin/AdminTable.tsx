@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import React from 'react'
-import { Product } from '@/data/products'
+import { Product } from '@/types/product'
 import Button from '@/components/ui/Button'
 
 type Props = {
@@ -28,10 +28,14 @@ export default function AdminTable({ items, onEdit, onDelete }: Props) {
             <tr key={it.id} className="border-t border-[#2B2B2B]">
               <td className="px-4 py-4">
                 <div className="flex items-center gap-3">
-                  <img src={it.image} alt={it.name} className="h-12 w-10 object-cover" />
+                  <img
+                    src={it.images?.[0] ?? 'https://placehold.co/80x80/111111/F5F5F5?text=No+Image'}
+                    alt={it.name}
+                    className="h-12 w-10 object-cover"
+                  />
                   <div>
                     <div className="text-sm font-semibold text-[#F5F5F5]">{it.name}</div>
-                    <div className="text-xs text-[#D9D0A7]">{it.description}</div>
+                    <div className="text-xs text-[#D9D0A7]">{it.description ?? 'No description'}</div>
                   </div>
                 </div>
               </td>

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useMemo, useState } from 'react'
 import Input from '@/components/ui/Input'
@@ -34,7 +34,7 @@ export default function ShopPage() {
     }
 
     if (category !== 'All') {
-      list = list.filter((product) => product.category.toLowerCase().includes(category.toLowerCase()))
+      list = list.filter((product) => product.category.toLowerCase() === category.toLowerCase())
     }
 
     if (sort === 'low') list = [...list].sort((a, b) => a.price - b.price)

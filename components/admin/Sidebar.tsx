@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React from 'react'
 import Link from 'next/link'
@@ -6,6 +6,7 @@ import Link from 'next/link'
 const items = [
   { label: 'Dashboard', href: '/admin/dashboard' },
   { label: 'Products', href: '/admin/products' },
+  { label: 'Orders', href: '/admin/orders' },
 ]
 
 export default function Sidebar() {

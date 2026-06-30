@@ -1,26 +1,65 @@
-"use client"
+"use client";
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
+import { useAuth } from '@/components/ui/context/AuthContext'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
+  const router = useRouter()
 
-  function submit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // placeholder: no auth yet
-    console.log('login', { email, password })
+    setError('')
+    setLoading(true)
+
+    try {
+      await login(email.trim(), password)
+      router.push('/admin/dashboard')
+    } catch (authError) {
+      setError('Invalid email or password. Please try again.')
+      console.error('Login failed', authError)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#0b0b0b] p-6">
-      <form onSubmit={submit} className="w-full max-w-md space-y-6 rounded-lg border border-[#7A5C3E]/10 bg-[#111111] p-8">
-        <h2 className="text-2xl font-semibold">Admin Login</h2>
-        <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <Input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <Button type="submit">Login</Button>
+      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 rounded-3xl border border-[#7A5C3E]/10 bg-[#111111] p-8 shadow-xl">
+        <div className="space-y-3">
+          <h2 className="text-3xl font-semibold text-[#F5F5F5]">Admin Login</h2>
+          <p className="text-sm text-[#F5F5F5]/70">Sign in to manage products, orders, and store settings.</p>
+        </div>
+
+        {error ? <div className="rounded-xl bg-[#5B1E1E] p-3 text-sm text-[#F5F5F5]">{error}</div> : null}
+
+        <div className="space-y-4">
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? 'Signing in…' : 'Login'}
+        </Button>
       </form>
     </main>
   )

@@ -1,15 +1,23 @@
-"use client"
+"use client";
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { products as allProducts, Product } from '@/data/products'
+import { useRouter } from 'next/navigation'
+import { Product } from '@/types/product'
+import useProducts from '@/hooks/useProducts'
+import { deleteProduct } from '@/services/productService'
 import AdminTable from '@/components/admin/AdminTable'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 
 export default function ProductsPage() {
   const [query, setQuery] = useState('')
-  const [items, setItems] = useState<Product[]>(allProducts)
+  const { products, loading, refreshProducts } = useProducts()
+  const [items, setItems] = useState<Product[]>([])
+
+  useEffect(() => {
+    setItems(products)
+  }, [products])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -17,14 +25,23 @@ export default function ProductsPage() {
     return items.filter((p) => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))
   }, [query, items])
 
-  function handleDelete(id: string) {
+  const router = useRouter()
+
+  async function handleDelete(id: string) {
     if (!confirm('Delete this product?')) return
-    setItems((s) => s.filter((p) => p.id !== id))
+
+    try {
+      await deleteProduct(id)
+      await refreshProducts()
+      setItems((s) => s.filter((p) => p.id !== id))
+    } catch (error) {
+      console.error('Failed to delete product', error)
+      alert('Unable to delete product. Please try again.')
+    }
   }
 
   function handleEdit(id: string) {
-    // navigate to edit or open modal; placeholder
-    alert('Edit ' + id)
+    router.push(`/admin/products/${id}/edit`)
   }
 
   return (

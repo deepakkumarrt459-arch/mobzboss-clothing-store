@@ -1,8 +1,14 @@
-import { Product, products } from '@/data/products'
+"use client"
 
-const trendingProducts: Product[] = products.slice(0, 4)
+import Link from 'next/link'
+import { useMemo } from 'react'
+import { Product } from '@/types/product'
+import useProducts from '@/hooks/useProducts'
 
 export default function TrendingProducts() {
+  const { products, loading } = useProducts()
+  const trendingProducts = useMemo(() => products.slice(0, 4), [products])
+
   return (
     <section id="trending" className="bg-[#2B2B2B] py-20 text-[#F5F5F5]">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -23,36 +29,42 @@ export default function TrendingProducts() {
         </div>
 
         <div className="mt-12 grid gap-8 lg:grid-cols-4">
-          {trendingProducts.map((product) => (
-            <article
-              key={product.id}
-              className="group overflow-hidden rounded-[2rem] border border-[#7A5C3E]/15 bg-[#111111]/95 shadow-[0_30px_70px_-40px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_40px_90px_-40px_rgba(0,0,0,0.95)]"
-            >
-              <div className="overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="h-[380px] w-full object-cover transition duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="space-y-4 p-6">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm uppercase tracking-[0.3em] text-[#C9A227]/80">{product.category}</p>
-                    <h3 className="mt-2 text-xl font-semibold text-[#F5F5F5]">{product.name}</h3>
+          {loading ? (
+            <div className="col-span-full rounded-[2rem] border border-[#7A5C3E]/15 bg-[#111111]/95 p-12 text-center text-[#D9D0A7]">Loading products…</div>
+          ) : trendingProducts.length === 0 ? (
+            <div className="col-span-full rounded-[2rem] border border-[#7A5C3E]/15 bg-[#111111]/95 p-12 text-center text-[#D9D0A7]">No products available.</div>
+          ) : (
+            trendingProducts.map((product) => (
+              <article
+                key={product.id}
+                className="group overflow-hidden rounded-[2rem] border border-[#7A5C3E]/15 bg-[#111111]/95 shadow-[0_30px_70px_-40px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_40px_90px_-40px_rgba(0,0,0,0.95)]"
+              >
+                <Link href={`/product/${product.id}`} className="overflow-hidden block">
+                  <img
+                    src={product.images?.[0] ?? 'https://placehold.co/400x500/111111/F5F5F5?text=No+Image'}
+                    alt={product.name}
+                    className="h-[380px] w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                </Link>
+                <div className="space-y-4 p-6">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm uppercase tracking-[0.3em] text-[#C9A227]/80">{product.category}</p>
+                      <h3 className="mt-2 text-xl font-semibold text-[#F5F5F5]">{product.name}</h3>
+                    </div>
+                    <span className="text-sm font-semibold text-[#C9A227]">₹{product.price.toFixed(0)}</span>
                   </div>
-                  <span className="text-sm font-semibold text-[#C9A227]">{product.price}</span>
+                  <p className="text-sm leading-7 text-[#D9D0A7]">{product.description ?? ''}</p>
+                  <Link
+                    href={`/product/${product.id}`}
+                    className="inline-flex rounded-full bg-[#C9A227] px-4 py-2 text-sm font-semibold text-[#111111] transition duration-300 hover:bg-[#b69323]"
+                  >
+                    View Product
+                  </Link>
                 </div>
-                <p className="text-sm leading-7 text-[#D9D0A7]">{product.description}</p>
-                <a
-                  href="#contact"
-                  className="inline-flex rounded-full bg-[#C9A227] px-4 py-2 text-sm font-semibold text-[#111111] transition duration-300 hover:bg-[#b69323]"
-                >
-                  Reserve Now
-                </a>
-              </div>
-            </article>
-          ))}
+              </article>
+            ))
+          )}
         </div>
       </div>
     </section>
