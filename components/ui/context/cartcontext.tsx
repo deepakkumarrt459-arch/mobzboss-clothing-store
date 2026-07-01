@@ -50,13 +50,18 @@ export const CartProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
 
 	const addToCart = (product: Product, quantity = 1) => {
 		setItems((prev) => {
+			if (product.stock <= 0) return prev
 			const idx = prev.findIndex((p) => p.product.id === product.id)
+			const targetQuantity = Math.max(1, quantity)
 			if (idx > -1) {
 				const copy = [...prev]
-				copy[idx] = { ...copy[idx], quantity: copy[idx].quantity + quantity }
+				copy[idx] = {
+					...copy[idx],
+					quantity: Math.min(copy[idx].quantity + targetQuantity, product.stock),
+				}
 				return copy
 			}
-			return [...prev, { product, quantity }]
+			return [...prev, { product, quantity: Math.min(targetQuantity, product.stock) }]
 		})
 		setIsOpen(true)
 	}
@@ -66,7 +71,13 @@ export const CartProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
 	}
 
 	const increaseQuantity = (productId: string) => {
-		setItems((prev) => prev.map((p) => (p.product.id === productId ? { ...p, quantity: p.quantity + 1 } : p)))
+		setItems((prev) =>
+			prev.map((p) => {
+				if (p.product.id !== productId) return p
+				if (p.quantity >= p.product.stock) return p
+				return { ...p, quantity: p.quantity + 1 }
+			}),
+		)
 	}
 
 	const decreaseQuantity = (productId: string) => {

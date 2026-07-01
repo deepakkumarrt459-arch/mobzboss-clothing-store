@@ -22,7 +22,10 @@ const ordersCollection = () => collection(getDb(), 'orders')
 export async function createOrder(order: Omit<Order, 'id' | 'createdAt'>): Promise<string> {
   const payload = {
     ...order,
+    status: order.status ?? 'Pending',
+    paymentStatus: order.paymentStatus ?? 'Paid',
     createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
   }
 
   const docRef = await addDoc(ordersCollection(), payload)
@@ -39,6 +42,7 @@ export async function getOrders(): Promise<Order[]> {
       id: docSnap.id,
       userId: data.userId as string | undefined,
       customerName: data.customerName as string,
+      email: data.email as string,
       phone: data.phone as string,
       address: data.address as string,
       items: data.items as Array<{
@@ -50,7 +54,9 @@ export async function getOrders(): Promise<Order[]> {
       }>,
       total: data.total as number,
       status: data.status as Order['status'],
+      paymentStatus: (data.paymentStatus as Order['paymentStatus']) ?? 'Paid',
       createdAt: data.createdAt?.toDate?.() ?? undefined,
+      updatedAt: data.updatedAt?.toDate?.() ?? undefined,
     }
   })
 }
@@ -65,6 +71,7 @@ export async function getOrdersByUserId(userId: string): Promise<Order[]> {
       id: docSnap.id,
       userId: data.userId as string | undefined,
       customerName: data.customerName as string,
+      email: data.email as string,
       phone: data.phone as string,
       address: data.address as string,
       items: data.items as Array<{
@@ -76,7 +83,9 @@ export async function getOrdersByUserId(userId: string): Promise<Order[]> {
       }>,
       total: data.total as number,
       status: data.status as Order['status'],
+      paymentStatus: (data.paymentStatus as Order['paymentStatus']) ?? 'Paid',
       createdAt: data.createdAt?.toDate?.() ?? undefined,
+      updatedAt: data.updatedAt?.toDate?.() ?? undefined,
     }
   })
 }
@@ -84,5 +93,5 @@ export async function getOrdersByUserId(userId: string): Promise<Order[]> {
 export async function updateOrderStatus(id: string, status: Order['status']): Promise<void> {
   const d = getDb()
   const orderDoc = doc(d, 'orders', id)
-  await updateDoc(orderDoc, { status })
+  await updateDoc(orderDoc, { status, updatedAt: Timestamp.now() })
 }

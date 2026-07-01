@@ -37,15 +37,21 @@ export default function ProductPage() {
   const { addToCart } = useCart()
   const router = useRouter()
 
-  const increase = () => setQty((q) => q + 1)
+  const increase = () => setQty((q) => {
+    if (!product) return q
+    if (q >= product.stock) return q
+    return q + 1
+  })
+
   const decrease = () => setQty((q) => Math.max(1, q - 1))
 
   const handleAddToCart = () => {
-    if (!product) return
-    addToCart(product, qty)
+    if (!product || product.stock <= 0) return
+    addToCart(product, Math.min(qty, product.stock))
   }
 
   const handleBuyNow = () => {
+    if (!product || product.stock <= 0) return
     handleAddToCart()
     router.push('/cart')
   }
@@ -110,18 +116,30 @@ export default function ProductPage() {
             </div>
           </div>
 
-          <div className="mt-6 flex items-center gap-4">
+          <div className="mt-6 flex flex-wrap items-center gap-4">
             <div className="flex items-center rounded-md bg-[#151515]">
               <button onClick={decrease} className="px-3 py-1 text-sm text-[#F5F5F5]/90">-</button>
               <div className="px-4 py-1 text-sm font-medium">{qty}</div>
               <button onClick={increase} className="px-3 py-1 text-sm text-[#F5F5F5]/90">+</button>
             </div>
 
-            <button onClick={handleAddToCart} className="rounded-full bg-[#C9A227] px-5 py-2 text-sm font-semibold text-[#111111]">
-              Add to Cart
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock <= 0}
+              className={`rounded-full px-5 py-2 text-sm font-semibold text-[#111111] transition ${
+                product.stock <= 0 ? 'bg-[#555555] cursor-not-allowed' : 'bg-[#C9A227] hover:bg-[#b69323]'
+              }`}
+            >
+              {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
             </button>
-            <button onClick={handleBuyNow} className="rounded-full border border-[#C9A227] px-5 py-2 text-sm font-semibold text-[#C9A227]">
-              Buy Now
+            <button
+              onClick={handleBuyNow}
+              disabled={product.stock <= 0}
+              className={`rounded-full border px-5 py-2 text-sm font-semibold transition ${
+                product.stock <= 0 ? 'border-[#555555] text-[#777777] cursor-not-allowed' : 'border-[#C9A227] text-[#C9A227] hover:border-[#ebc656] hover:text-[#ebc656]'
+              }`}
+            >
+              {product.stock <= 0 ? 'Unavailable' : 'Buy Now'}
             </button>
           </div>
 

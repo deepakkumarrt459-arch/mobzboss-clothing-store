@@ -17,7 +17,9 @@ export default function ProductCard({ product }: Props) {
   const { addToCart } = useCart()
   const [added, setAdded] = useState(false)
 
+  const isOutOfStock = product.stock <= 0
   const handleAdd = () => {
+    if (isOutOfStock) return
     addToCart(product)
     setAdded(true)
     setTimeout(() => setAdded(false), 1400)
@@ -38,16 +40,25 @@ export default function ProductCard({ product }: Props) {
         <Link href={`/product/${product.id}`} className="mt-3 block text-xs text-[#D9D0A7] line-clamp-2 hover:text-[#C9A227]">
           {product.description}
         </Link>
+        <div className="mt-3 flex items-center justify-between text-xs text-[#F5F5F5]/70">
+          <span>{isOutOfStock ? 'Out of stock' : `Stock: ${product.stock} available`}</span>
+          <span>{ratingLabel}</span>
+        </div>
         <div className="mt-4 flex items-center justify-between">
           <div className="relative">
-            <button onClick={handleAdd} className="rounded-full bg-[#C9A227] px-4 py-2 text-xs font-semibold text-[#111111] transition hover:bg-[#b69323]">
-              Add to Cart
+            <button
+              onClick={handleAdd}
+              disabled={isOutOfStock}
+              className={`rounded-full px-4 py-2 text-xs font-semibold text-[#111111] transition ${
+                isOutOfStock ? 'bg-[#555555] cursor-not-allowed' : 'bg-[#C9A227] hover:bg-[#b69323]'
+              }`}
+            >
+              {isOutOfStock ? 'Sold out' : 'Add to Cart'}
             </button>
-            {added && (
+            {added && !isOutOfStock && (
               <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-md bg-[#C9A227] px-2 py-1 text-xs font-semibold text-[#111111]">Added to Cart</span>
             )}
           </div>
-          <div className="text-xs text-[#F5F5F5]/70">{ratingLabel}</div>
         </div>
       </div>
     </article>

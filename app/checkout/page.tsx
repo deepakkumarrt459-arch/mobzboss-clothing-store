@@ -6,9 +6,7 @@ import { useRouter } from 'next/navigation'
 import Input from '../../components/ui/Input'
 import { useCart } from '../../components/ui/context/cartcontext'
 import { useAuth } from '../../components/ui/context/AuthContext'
-import { createOrder } from '../../services/orderservice'
 import { loadRazorpayScript } from '../../lib/razorpay'
-import type { Order } from '../../types/order'
 
 interface RazorpayOrderResponse {
   order_id: string
@@ -49,6 +47,23 @@ export default function CheckoutPage() {
     setIsSubmitting(true)
 
     try {
+      const validationResponse = await fetch('/api/payment/validate-stock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: orderItems }),
+      })
+
+      if (!validationResponse.ok) {
+        const validationData = await validationResponse.json().catch(() => null)
+        const message = validationData?.error || 'Some items are no longer available in the requested quantity.'
+        const issueText = Array.isArray(validationData?.issues)
+          ? validationData.issues.map((issue: any) => `${issue.name}: ${issue.available} available`).join('\n')
+          : ''
+        alert(`${message}${issueText ? `\n${issueText}` : ''}`)
+        setIsSubmitting(false)
+        return
+      }
+
       await loadRazorpayScript()
 
       const response = await fetch('/api/payment/create-order', {
@@ -87,6 +102,13 @@ export default function CheckoutPage() {
                 razorpay_payment_id: paymentResult.razorpay_payment_id,
                 razorpay_order_id: paymentResult.razorpay_order_id,
                 razorpay_signature: paymentResult.razorpay_signature,
+                items: orderItems,
+                customerName: customerName.trim(),
+                email: user?.email ?? '',
+                phone: phone.trim(),
+                address: address.trim(),
+                total,
+                userId: user?.uid ?? '',
               }),
             })
 
@@ -99,18 +121,8 @@ export default function CheckoutPage() {
               throw new Error(verifyData.error || 'Verification response invalid')
             }
 
-            const order: Omit<Order, 'id' | 'createdAt'> = {
-              userId: user?.uid,
-              customerName: customerName.trim(),
-              phone: phone.trim(),
-              address: address.trim(),
-              items: orderItems,
-              total,
-              status: 'Pending',
-            }
-
-            await createOrder(order)
             clearCart()
+            setIsSubmitting(false)
             router.push('/order-success')
           } catch (verifyError) {
             console.error('Payment verification error', verifyError)

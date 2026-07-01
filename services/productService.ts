@@ -19,7 +19,7 @@ function normalizeFirestoreProduct(product: Omit<Product, 'id' | 'createdAt'>) {
     sizes: product.sizes && product.sizes.length ? product.sizes : DEFAULT_SIZES,
     colors: product.colors && product.colors.length ? product.colors : DEFAULT_COLORS,
     rating: typeof product.rating === 'number' ? product.rating : DEFAULT_RATING,
-    stock: typeof product.stock === 'number' ? product.stock : DEFAULT_STOCK,
+    stock: typeof product.stock === 'number' ? Math.max(0, product.stock) : DEFAULT_STOCK,
   }
 }
 
@@ -92,7 +92,11 @@ export async function getProduct(id: string): Promise<Product | null> {
 export async function updateProduct(id: string, product: Partial<Omit<Product, 'id' | 'createdAt'>>) {
   if (!db) throw new Error('Firestore not initialized')
   const productRef = doc(db, PRODUCTS_COLLECTION, id)
-  await setDoc(productRef, product, { merge: true })
+  const sanitizedProduct = {
+    ...product,
+    stock: product.stock !== undefined ? Math.max(0, product.stock) : undefined,
+  }
+  await setDoc(productRef, sanitizedProduct, { merge: true })
 }
 
 /**

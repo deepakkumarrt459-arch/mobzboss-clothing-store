@@ -6,6 +6,42 @@ import { updateOrderStatus } from '../../../services/orderservice'
 import Link from 'next/link'
 import type { Order } from '../../../types/order'
 
+const ORDER_STATUSES: Order['status'][] = ['Pending', 'Confirmed', 'Packed', 'Shipped', 'Delivered', 'Cancelled']
+
+function statusClass(status: Order['status']) {
+  switch (status) {
+    case 'Pending':
+      return 'bg-[#4b4a1e]/20 text-[#F5D76E]'
+    case 'Confirmed':
+      return 'bg-[#1e3f6e]/20 text-[#6CB2EB]'
+    case 'Packed':
+      return 'bg-[#4a2f6e]/20 text-[#B57EEA]'
+    case 'Shipped':
+      return 'bg-[#6e4a1e]/20 text-[#F6AD55]'
+    case 'Delivered':
+      return 'bg-[#1e6e40]/20 text-[#7ED957]'
+    case 'Cancelled':
+      return 'bg-[#6e1e2b]/20 text-[#F56565]'
+    default:
+      return 'bg-[#C9A227]/20 text-[#C9A227]'
+  }
+}
+
+function paymentStatusClass(status: Order['paymentStatus']) {
+  switch (status) {
+    case 'Paid':
+      return 'bg-[#1e6e40]/20 text-[#7ED957]'
+    case 'Pending':
+      return 'bg-[#4b4a1e]/20 text-[#F5D76E]'
+    case 'Failed':
+      return 'bg-[#6e1e2b]/20 text-[#F56565]'
+    case 'Refunded':
+      return 'bg-[#1e3f6e]/20 text-[#6CB2EB]'
+    default:
+      return 'bg-[#C9A227]/20 text-[#C9A227]'
+  }
+}
+
 export default function AdminOrdersPage() {
   const { orders, loading, refreshOrders } = useOrders()
   const [isUpdating, setIsUpdating] = useState(false)
@@ -46,43 +82,47 @@ export default function AdminOrdersPage() {
           <table className="min-w-full border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-[#7A5C3E]/10 text-[#F5F5F5]/80">
+                <th className="px-4 py-3">Order ID</th>
                 <th className="px-4 py-3">Customer</th>
-                <th className="px-4 py-3">Phone</th>
+                <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Total</th>
+                <th className="px-4 py-3">Payment</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Actions</th>
+                <th className="px-4 py-3">Update</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order: Order) => (
                 <tr key={order.id} className="border-b border-[#7A5C3E]/10">
+                  <td className="px-4 py-4 text-[#F5F5F5]/80">{order.id}</td>
                   <td className="px-4 py-4 text-[#F5F5F5]">{order.customerName}</td>
-                  <td className="px-4 py-4 text-[#F5F5F5]/80">{order.phone}</td>
+                  <td className="px-4 py-4 text-[#F5F5F5]/80">{order.email}</td>
                   <td className="px-4 py-4 text-[#F5F5F5]">₹{order.total.toFixed(0)}</td>
                   <td className="px-4 py-4">
-                    <span className="inline-flex rounded-full bg-[#C9A227]/15 px-3 py-1 text-xs font-semibold text-[#C9A227]">
+                    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${paymentStatusClass(order.paymentStatus)}`}>
+                      {order.paymentStatus}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusClass(order.status)}`}>
                       {order.status}
                     </span>
                   </td>
                   <td className="px-4 py-4 text-[#F5F5F5]/80">{order.createdAt ? order.createdAt.toLocaleString() : '—'}</td>
-                  <td className="px-4 py-4 space-x-2">
-                    <button
-                      type="button"
-                      disabled={order.status !== 'Pending' || isUpdating}
-                      onClick={() => order.id && handleStatusUpdate(order.id, 'Shipped')}
-                      className="rounded-full bg-[#C9A227] px-3 py-2 text-xs font-semibold text-[#111111] disabled:cursor-not-allowed disabled:opacity-50"
+                  <td className="px-4 py-4">
+                    <select
+                      value={order.status}
+                      disabled={isUpdating}
+                      onChange={(event) => order.id && handleStatusUpdate(order.id, event.target.value as Order['status'])}
+                      className="rounded-full border border-[#7A5C3E]/20 bg-[#111111] px-3 py-2 text-sm text-[#F5F5F5] outline-none transition hover:border-[#C9A227]"
                     >
-                      Mark as Shipped
-                    </button>
-                    <button
-                      type="button"
-                      disabled={order.status === 'Delivered' || isUpdating}
-                      onClick={() => order.id && handleStatusUpdate(order.id, 'Delivered')}
-                      className="rounded-full border border-[#F5F5F5]/10 bg-transparent px-3 py-2 text-xs font-semibold text-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-50 hover:border-[#C9A227] hover:text-[#C9A227]"
-                    >
-                      Mark as Delivered
-                    </button>
+                      {ORDER_STATUSES.map((status) => (
+                        <option key={status} value={status} className="bg-[#111111] text-[#F5F5F5]">
+                          {status}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                 </tr>
               ))}

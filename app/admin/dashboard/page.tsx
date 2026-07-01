@@ -94,9 +94,18 @@ export default function DashboardPage() {
 
         const recent: RecentOrder[] = []
 
+        const convertToDate = (value: unknown): Date | null => {
+          if (!value) return null
+          if (value instanceof Date) return value
+          if (typeof value === 'object' && value !== null && 'toDate' in value && typeof (value as any).toDate === 'function') {
+            return (value as any).toDate()
+          }
+          return null
+        }
+
         orderSnapshot.docs.slice(0, 5).forEach((docSnap) => {
           const data = docSnap.data() as Partial<Order>
-          const createdAt = data.createdAt?.toDate?.()
+          const createdAt = convertToDate(data.createdAt)
           const dateLabel = createdAt
             ? createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
             : 'Unknown'
@@ -118,7 +127,7 @@ export default function DashboardPage() {
           const total = typeof data.total === 'number' ? data.total : 0
           revenue += total
 
-          const createdAt = data.createdAt?.toDate?.()
+          const createdAt = convertToDate(data.createdAt)
           if (createdAt) {
             const monthLabel = createdAt.toLocaleString('default', { month: 'short', year: 'numeric' })
             monthlyRevenueMap.set(monthLabel, (monthlyRevenueMap.get(monthLabel) ?? 0) + total)
@@ -196,6 +205,12 @@ export default function DashboardPage() {
         <Card title="Orders" value={totalOrders} />
         <Card title="Customers" value={totalCustomers} />
         <Card title="Revenue" value={`₹${totalRevenue.toLocaleString()}`} />
+      </div>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Card title="Low stock" value={products.filter((product) => product.stock > 0 && product.stock <= 5).length} />
+        <Card title="Out of stock" value={products.filter((product) => product.stock <= 0).length} />
+        <Card title="In stock" value={products.filter((product) => product.stock > 5).length} />
+        <Card title="Active products" value={productCount} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">

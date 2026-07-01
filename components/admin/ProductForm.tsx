@@ -35,7 +35,7 @@ export default function ProductForm({ onSubmit, disabled = false, initialValues,
   const [description, setDescription] = useState(initialValues?.description ?? '')
   const [sizes, setSizes] = useState(initialValues?.sizes?.join(',') ?? DEFAULT_SIZES.join(','))
   const [colors, setColors] = useState(initialValues?.colors?.join(',') ?? DEFAULT_COLORS.join(','))
-  const [stock, setStock] = useState(initialValues?.stock ? String(initialValues.stock) : String(DEFAULT_STOCK))
+  const [stock, setStock] = useState(initialValues?.stock !== undefined ? String(initialValues.stock) : '0')
   const [rating, setRating] = useState(initialValues?.rating ? String(initialValues.rating) : String(DEFAULT_RATING))
   const [image, setImage] = useState(initialValues?.image ?? '')
 
@@ -48,7 +48,7 @@ export default function ProductForm({ onSubmit, disabled = false, initialValues,
     setDescription(initialValues.description)
     setSizes(initialValues.sizes.join(','))
     setColors(initialValues.colors.join(','))
-    setStock(String(initialValues.stock))
+    setStock(String(initialValues.stock ?? 0))
     setRating(String(initialValues.rating))
     setImage(initialValues.image)
   }, [initialValues])
@@ -58,6 +58,12 @@ export default function ProductForm({ onSubmit, disabled = false, initialValues,
 
     if (!name.trim() || !price.trim() || !description.trim() || !image.trim()) {
       alert('Please fill in name, price, description, and image filename.')
+      return
+    }
+
+    const parsedStock = Number(stock)
+    if (Number.isNaN(parsedStock) || parsedStock < 0) {
+      alert('Stock must be a non-negative number.')
       return
     }
 
@@ -78,7 +84,7 @@ export default function ProductForm({ onSubmit, disabled = false, initialValues,
       description: description.trim(),
       sizes: parsedSizes.length ? parsedSizes : DEFAULT_SIZES,
       colors: parsedColors.length ? parsedColors : DEFAULT_COLORS,
-      stock: Number(stock) || DEFAULT_STOCK,
+      stock: parsedStock,
       rating: Number(rating) || DEFAULT_RATING,
       image: image.trim(),
     }
@@ -96,11 +102,18 @@ export default function ProductForm({ onSubmit, disabled = false, initialValues,
         disabled={disabled}
         className="rounded-md border border-[#7A5C3E]/10 bg-[#111111] px-3 py-2 text-sm text-[#F5F5F5]"
       >
-        <option>Outerwear</option>
-        <option>Tops</option>
-        <option>Bottoms</option>
+        <option>T-Shirts</option>
+        <option>Oversized T-Shirts</option>
+        <option>Shirts</option>
+        <option>Hoodies</option>
+        <option>Sweatshirts</option>
+        <option>Jerkins</option>
+        <option>Jackets</option>
+        <option>Cargo Pants</option>
+        <option>Jeans</option>
+        <option>Shorts</option>
+        <option>Track Pants</option>
         <option>Accessories</option>
-        <option>Essentials</option>
       </select>
       <textarea
         value={description}
@@ -112,7 +125,14 @@ export default function ProductForm({ onSubmit, disabled = false, initialValues,
       <Input placeholder="Sizes (comma separated)" value={sizes} onChange={(e) => setSizes(e.target.value)} disabled={disabled} />
       <Input placeholder="Colors (comma separated)" value={colors} onChange={(e) => setColors(e.target.value)} disabled={disabled} />
       <Input placeholder="Rating (number)" value={rating} onChange={(e) => setRating(e.target.value)} disabled={disabled} />
-      <Input placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} disabled={disabled} />
+      <Input
+        placeholder="Stock"
+        type="number"
+        value={stock}
+        onChange={(e) => setStock(e.target.value)}
+        disabled={disabled}
+        min={0}
+      />
       <Input
         placeholder="Image filename (e.g. ferari.jpeg)"
         value={image}

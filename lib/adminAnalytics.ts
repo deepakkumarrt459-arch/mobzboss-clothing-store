@@ -24,21 +24,31 @@ export async function getTotalRevenue(): Promise<number> {
   }, 0)
 }
 
+function convertToDate(value: unknown): Date | undefined {
+  if (value instanceof Date) return value
+  if (typeof value === 'object' && value !== null && 'toDate' in value && typeof (value as any).toDate === 'function') {
+    return (value as any).toDate()
+  }
+  return undefined
+}
+
 export async function getRecentOrders(limit = 5): Promise<Order[]> {
   const q = query(ordersCollection(), orderBy('createdAt', 'desc'))
   const snapshot = await getDocs(q)
   return snapshot.docs.slice(0, limit).map((docSnap) => {
-    const data = docSnap.data() as Order
+    const data = docSnap.data() as Record<string, unknown>
     return {
       id: docSnap.id,
-      userId: data.userId,
-      customerName: data.customerName,
-      phone: data.phone,
-      address: data.address,
-      items: data.items,
-      total: data.total,
-      status: data.status,
-      createdAt: data.createdAt?.toDate?.() ?? undefined,
+      userId: typeof data.userId === 'string' ? data.userId : undefined,
+      customerName: typeof data.customerName === 'string' ? data.customerName : '',
+      email: typeof data.email === 'string' ? data.email : '',
+      phone: typeof data.phone === 'string' ? data.phone : '',
+      address: typeof data.address === 'string' ? data.address : '',
+      items: Array.isArray(data.items) ? (data.items as Order['items']) : [],
+      total: typeof data.total === 'number' ? data.total : 0,
+      status: (data.status as Order['status']) ?? 'Pending',
+      paymentStatus: (data.paymentStatus as Order['paymentStatus']) ?? 'Paid',
+      createdAt: convertToDate(data.createdAt),
     }
   })
 }
@@ -51,21 +61,21 @@ export async function getTotalProducts(): Promise<number> {
 export async function getTopProducts(limit = 5): Promise<Product[]> {
   const snapshot = await getDocs(productsCollection())
   const products = snapshot.docs.map((docSnap) => {
-    const data = docSnap.data() as Product
+    const data = docSnap.data() as Record<string, unknown>
     return {
       id: docSnap.id,
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      category: data.category,
-      sizes: data.sizes,
-      colors: data.colors,
-      stock: data.stock,
-      images: data.images,
-      featured: data.featured,
-      rating: data.rating,
-      createdAt: data.createdAt?.toDate?.() ?? undefined,
-    }
+      name: typeof data.name === 'string' ? data.name : 'Untitled product',
+      price: typeof data.price === 'number' ? data.price : 0,
+      category: typeof data.category === 'string' ? data.category : 'Uncategorized',
+      description: typeof data.description === 'string' ? data.description : '',
+      sizes: Array.isArray(data.sizes) ? (data.sizes as string[]) : [],
+      colors: Array.isArray(data.colors) ? (data.colors as string[]) : [],
+      stock: typeof data.stock === 'number' ? data.stock : 0,
+      images: Array.isArray(data.images) ? (data.images as string[]) : [],
+      featured: typeof data.featured === 'boolean' ? data.featured : false,
+      rating: typeof data.rating === 'number' ? data.rating : 0,
+      createdAt: convertToDate(data.createdAt),
+    } satisfies Product
   })
 
   return products.slice(0, limit)
@@ -80,7 +90,7 @@ export async function getRevenueChartData(): Promise<Array<{ label: string; reve
   const snapshot = await getDocs(ordersCollection())
   const groups = snapshot.docs.reduce<Record<string, number>>((acc, docSnap) => {
     const data = docSnap.data() as Order
-    const createdAt = data.createdAt?.toDate?.()
+    const createdAt = convertToDate(data.createdAt)
     if (!createdAt) return acc
 
     const month = createdAt.toLocaleString('default', { month: 'short', year: 'numeric' })

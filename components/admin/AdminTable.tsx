@@ -20,6 +20,7 @@ export default function AdminTable({ items, onEdit, onDelete }: Props) {
             <th className="px-4 py-3">Category</th>
             <th className="px-4 py-3">Price</th>
             <th className="px-4 py-3">Stock</th>
+            <th className="px-4 py-3">Status</th>
             <th className="px-4 py-3">Actions</th>
           </tr>
         </thead>
@@ -40,8 +41,21 @@ export default function AdminTable({ items, onEdit, onDelete }: Props) {
                 </div>
               </td>
               <td className="px-4 py-4 text-sm text-[#D9D0A7]">{it.category}</td>
-              <td className="px-4 py-4 text-sm text-[#F5F5F5]">{it.price}</td>
-              <td className="px-4 py-4 text-sm text-[#D9D0A7]">—</td>
+              <td className="px-4 py-4 text-sm text-[#F5F5F5]">₹{it.price}</td>
+              <td className="px-4 py-4 text-sm text-[#F5F5F5]">{it.stock}</td>
+              <td className="px-4 py-4 text-sm">
+                <span
+                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                    it.stock > 5
+                      ? 'bg-[#213113] text-[#80C76F]'
+                      : it.stock > 0
+                      ? 'bg-[#3f2d0c] text-[#E9C175]'
+                      : 'bg-[#3a0d0d] text-[#F56B6B]'
+                  }`}
+                >
+                  {it.stock > 5 ? 'In Stock' : it.stock > 0 ? 'Low Stock' : 'Out of Stock'}
+                </span>
+              </td>
               <td className="px-4 py-4">
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" onClick={() => onEdit?.(it.id)}>Edit</Button>
