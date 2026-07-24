@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 export default function Hero() {
   return (
     <section id="home" className="relative overflow-hidden bg-[#111111] text-[#F5F5F5]">
@@ -30,12 +32,8 @@ export default function Hero() {
         </div>
 
         <div className="relative z-10 w-full sm:max-w-xl">
-          <div className="overflow-hidden rounded-[2rem] border border-[#7A5C3E]/20 bg-[#222222]/80 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.95)]">
-            <img
-              src="https://placehold.co/600x800/111111/F5F5F5?text=MobzBoss"
-              alt="MobzBoss premium streetwear collection"
-              className="h-full w-full object-cover transition duration-500 hover:scale-105"
-            />
+          <div className="overflow-hidden rounded-[2rem] border border-[#7A5C3E]/20 bg-[#222222]/80 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.95)] relative h-full">
+            <Image src="https://placehold.co/600x800/111111/F5F5F5?text=MobzBoss" alt="MobzBoss premium streetwear collection" fill className="object-cover transition duration-500 hover:scale-105" unoptimized />
           </div>
         </div>
       </div>

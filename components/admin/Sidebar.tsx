@@ -7,6 +7,7 @@ const items = [
   { label: 'Dashboard', href: '/admin/dashboard' },
   { label: 'Products', href: '/admin/products' },
   { label: 'Orders', href: '/admin/orders' },
+  { label: 'Coupons', href: '/admin/coupons' },
 ]
 
 export default function Sidebar() {

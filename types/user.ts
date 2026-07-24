@@ -4,5 +4,6 @@ export interface UserProfile {
   email: string
   phone: string
   address: string
+  role: string
   createdAt: Date
 }

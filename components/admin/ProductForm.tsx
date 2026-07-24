@@ -20,15 +20,13 @@ type Props = {
   onSubmit?: (payload: ProductFormPayload) => Promise<void> | void
   disabled?: boolean
   initialValues?: ProductFormPayload
-  submitLabel?: string
 }
 
 const DEFAULT_SIZES = ['S', 'M', 'L', 'XL']
 const DEFAULT_COLORS = ['Black', 'White']
 const DEFAULT_RATING = 4
-const DEFAULT_STOCK = 10
 
-export default function ProductForm({ onSubmit, disabled = false, initialValues, submitLabel }: Props) {
+export default function ProductForm({ onSubmit, disabled = false, initialValues }: Props) {
   const [name, setName] = useState(initialValues?.name ?? '')
   const [price, setPrice] = useState(initialValues?.price ? String(initialValues.price) : '')
   const [category, setCategory] = useState(initialValues?.category ?? 'Tops')

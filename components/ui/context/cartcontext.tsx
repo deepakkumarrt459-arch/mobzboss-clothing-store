@@ -27,18 +27,17 @@ const CartContext = createContext<CartContextValue | undefined>(undefined)
 
 const STORAGE_KEY = 'mobzboss_cart_v1'
 
-export const CartProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
-	const [items, setItems] = useState<CartItem[]>([])
-	const [isOpen, setIsOpen] = useState(false)
-
-	useEffect(() => {
+export function CartProvider({ children }: { children: React.ReactNode }) {
+	const [items, setItems] = useState<CartItem[]>(() => {
+		if (typeof window === 'undefined') return []
 		try {
 			const raw = localStorage.getItem(STORAGE_KEY)
-			if (raw) setItems(JSON.parse(raw))
-		} catch (e) {
-			console.error('Failed to load cart from localStorage', e)
+			return raw ? JSON.parse(raw) : []
+		} catch {
+			return []
 		}
-	}, [])
+	})
+	const [isOpen, setIsOpen] = useState(false)
 
 	useEffect(() => {
 		try {

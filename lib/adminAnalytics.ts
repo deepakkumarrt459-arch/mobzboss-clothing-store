@@ -1,4 +1,4 @@
-import { collection, getDocs, query, orderBy, where } from 'firebase/firestore'
+import { collection, getDocs, query, orderBy } from 'firebase/firestore'
 import { db } from './firebase'
 import type { Order } from '@/types/order'
 import type { Product } from '@/types/product'
@@ -26,8 +26,8 @@ export async function getTotalRevenue(): Promise<number> {
 
 function convertToDate(value: unknown): Date | undefined {
   if (value instanceof Date) return value
-  if (typeof value === 'object' && value !== null && 'toDate' in value && typeof (value as any).toDate === 'function') {
-    return (value as any).toDate()
+  if (typeof value === 'object' && value !== null && 'toDate' in value && typeof (value as { toDate?: unknown }).toDate === 'function') {
+    return (value as { toDate: () => Date }).toDate()
   }
   return undefined
 }

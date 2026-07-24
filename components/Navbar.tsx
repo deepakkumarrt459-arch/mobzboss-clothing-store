@@ -5,6 +5,7 @@ import Link from 'next/link'
 import CartButton from './cartcomponents/CartButton'
 import CartDrawer from './cartcomponents/CartDrawer'
 import { useAuth } from './ui/context/AuthContext'
+import { useWishlist } from '@/hooks/useWishlist'
 
 type NavItem = {
   label: string
@@ -22,6 +23,7 @@ const navItems: NavItem[] = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { user, logout } = useAuth()
+  const { wishlistIds } = useWishlist()
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#7A5C3E]/10 bg-[#111111]/95 text-[#F5F5F5] backdrop-blur-xl">
@@ -127,6 +129,16 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link href="/wishlist" className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#F5F5F5]/10 bg-[#2B2B2B]/95 text-[#F5F5F5] transition hover:border-[#C9A227] hover:text-[#C9A227]" aria-label="Open wishlist">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21s-6.4-4.35-8.2-7.12C2.3 11.9 2.6 9.3 4.5 8c1.3-.9 3-.8 4.2.2L12 9.4l3.3-1.2c1.2-1 2.9-1.1 4.2-.2 1.9 1.3 2.2 3.9.7 5.88C18.4 16.65 12 21 12 21Z" />
+            </svg>
+            {wishlistIds.length > 0 ? (
+              <span className="pointer-events-none absolute -top-1 -right-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[#C9A227] px-1.5 text-xs font-semibold text-[#111111]">
+                {wishlistIds.length}
+              </span>
+            ) : null}
+          </Link>
           <CartButton />
 
           <Link

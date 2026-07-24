@@ -1,0 +1,150 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ========== HELPER FUNCTIONS ==========
+    
+    function isAuthenticated() {
+      return request.auth != null
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId
+    }
+
+    function isValidOrderItem() {
+      return request.resource.data.productId is string &&
+             request.resource.data.quantity is int &&
+             request.resource.data.price is number &&
+             request.resource.data.name is string
+    }
+
+    // ========== PRODUCTS COLLECTION ==========
+    // Products are publicly readable but only admins can write
+    
+    match /products/{productId} {
+      // Public read access
+      allow read: if true;
+      
+      // Admin-only write access
+      allow create, update, delete: if isAdmin();
+
+      // Reviews subcollection under products
+      match /reviews/{reviewId} {
+        // Anyone can read reviews
+        allow read: if true;
+        
+        // Authenticated users can create/update only their own reviews
+        allow create: if isAuthenticated() && 
+                         request.resource.data.userId == request.auth.uid &&
+                         request.resource.data.rating is int &&
+                         request.resource.data.rating >= 1 &&
+                         request.resource.data.rating <= 5;
+        
+        allow update: if isOwner(resource.data.userId);
+        
+        // Admins can delete any review
+        allow delete: if isAdmin() || isOwner(resource.data.userId);
+      }
+    }
+
+    // ========== ORDERS COLLECTION ==========
+    // Users can only access their own orders
+    
+    match /orders/{orderId} {
+      // Users can read only their own orders
+      allow read: if isAuthenticated() && 
+                     (isOwner(resource.data.userId) || isAdmin());
+      
+      // Orders created via API with admin SDK
+      allow create: if false; // Only backend creates orders
+
+      // Admins can update orders
+      allow update: if isAdmin();
+      
+      allow delete: if isAdmin();
+    }
+
+    // ========== USERS COLLECTION ==========
+    // Users can only access and modify their own profile
+    
+    match /users/{userId} {
+      // Users can read only their own profile
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      // Users can update only their own profile
+      allow update: if isAuthenticated() && isOwner(userId) &&
+                       // Only allow updating safe fields
+                       (request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['name', 'phone', 'address']));
+      
+      // Prevent direct user creation/deletion (handled by backend)
+      allow create, delete: if false;
+    }
+
+    // ========== WISHLIST COLLECTION ==========
+    // Users can only access and modify their own wishlist
+    
+    match /wishlist/{userId} {
+      // Users can read only their own wishlist
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      allow write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // ========== CART COLLECTION ==========
+    // Users can only access and modify their own cart
+    
+    match /cart/{userId} {
+      // Users can read only their own cart
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      allow write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // ========== ANALYTICS COLLECTION ==========
+    // Analytics data is admin-only
+    
+    match /analytics/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // ========== COUPONS COLLECTION ==========
+    // Coupons are readable by anyone but only admins can write
+    
+    match /coupons/{couponId} {
+      // Public read access for active coupons
+      allow read: if true;
+      
+      // Admin-only write access
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ========== RECENTLY VIEWED COLLECTION ==========
+    // Users can only access their own recently viewed products
+    
+    match /recentlyViewed/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // ========== SEARCH HISTORY COLLECTION ==========
+    // Users can only access their own search history
+    
+    match /searchHistory/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // ========== DEFAULT DENY ==========
+    // Deny all other access
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

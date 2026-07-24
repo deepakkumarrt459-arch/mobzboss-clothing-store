@@ -7,7 +7,8 @@ export function loadRazorpayScript(): Promise<void> {
 
     const existingScript = document.querySelector<HTMLScriptElement>('script[src="https://checkout.razorpay.com/v1/checkout.js"]')
     if (existingScript) {
-      if ((window as any).Razorpay) {
+      const windowWithRazorpay = window as Window & { Razorpay?: new (options: unknown) => unknown }
+      if (windowWithRazorpay.Razorpay) {
         resolve()
       } else {
         existingScript.addEventListener('load', () => resolve())

@@ -10,6 +10,10 @@ import { useAuth } from '@/components/ui/context/AuthContext'
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
+  const getNextParam = () => {
+    if (typeof window === 'undefined') return null
+    return new URLSearchParams(window.location.search).get('next')
+  }
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(true)
@@ -23,7 +27,8 @@ export default function LoginPage() {
 
     try {
       await login(email.trim(), password, rememberMe)
-      router.push('/account')
+      const next = getNextParam() || '/account'
+      router.push(next)
     } catch (authError) {
       console.error('Login failed', authError)
       setError('Unable to login. Please check your email and password.')

@@ -22,7 +22,7 @@ export function initAdmin() {
 
   if (parsedCredentials) {
     if (!admin.apps.length) {
-      admin.initializeApp({ credential: admin.credential.cert(parsedCredentials as any) })
+      admin.initializeApp({ credential: admin.credential.cert(parsedCredentials as admin.ServiceAccount) })
     }
     adminDbRef = admin.firestore()
     initialized = true
@@ -42,7 +42,7 @@ export function initAdmin() {
 
   if (!admin.apps.length) {
     admin.initializeApp({
-      credential: admin.credential.cert({ projectId, clientEmail, privateKey } as any),
+      credential: admin.credential.cert({ projectId, clientEmail, privateKey } as admin.ServiceAccount),
     })
   }
 
@@ -55,6 +55,28 @@ export function getAdminDb() {
     throw new Error('Firebase Admin SDK is not initialized. Ensure admin credentials are provided (FIREBASE_ADMIN_CREDENTIALS or FIREBASE_ADMIN_PROJECT_ID/CLIENT_EMAIL/PRIVATE_KEY).')
   }
   return adminDbRef
+}
+
+export async function verifyFirebaseIdToken(idToken: string) {
+  if (!initialized) {
+    throw new Error('Firebase Admin SDK is not initialized. Ensure admin credentials are provided.')
+  }
+
+  return admin.auth().verifyIdToken(idToken)
+}
+
+export async function verifyAdminUser(idToken: string): Promise<string> {
+  const decodedToken = await verifyFirebaseIdToken(idToken)
+  const uid = decodedToken.uid
+  const firestore = getAdminDb()
+  const userDoc = await firestore.doc(`users/${uid}`).get()
+  const userData = userDoc.data() as Record<string, unknown> | undefined
+
+  if (!userDoc.exists || typeof userData?.role !== 'string' || userData.role !== 'admin') {
+    throw new Error('Unauthorized admin access')
+  }
+
+  return uid
 }
 
 export { admin }

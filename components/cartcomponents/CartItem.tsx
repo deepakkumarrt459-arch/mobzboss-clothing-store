@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react'
+import Image from 'next/image'
 import { CartItem as CI, useCart } from '../ui/context/cartcontext'
 
 export default function CartItem({ item }: { item: CI }) {
@@ -11,7 +12,7 @@ const isAtStockLimit = item.quantity >= item.product.stock
 
   return (
     <div className="flex items-center gap-4 rounded-md border border-[#7A5C3E]/10 p-3">
-      <img src={item.product.images?.[0] ?? '/products/placeholder.png'} alt={item.product.name} className="h-16 w-16 rounded-md object-cover" />
+      <Image src={item.product.images?.[0] ?? '/products/placeholder.png'} alt={item.product.name} width={64} height={64} className="rounded-md object-cover" unoptimized />
 
       <div className="flex-1">
         <div className="flex items-center justify-between">

@@ -14,8 +14,10 @@ export function useUser() {
 
   useEffect(() => {
     if (!userId) {
-      setProfile(null)
-      setLoading(false)
+      void Promise.resolve().then(() => {
+        setProfile(null)
+        setLoading(false)
+      })
       return
     }
 

@@ -105,12 +105,7 @@ export default function EditProductPage() {
       </div>
 
       <div className="mt-6 max-w-2xl">
-        <ProductForm
-          initialValues={initialValues}
-          submitLabel={saving ? 'Saving…' : 'Save Changes'}
-          disabled={saving}
-          onSubmit={handleSubmit}
-        />
+        <ProductForm initialValues={initialValues} disabled={saving} onSubmit={handleSubmit} />
       </div>
     </section>
   )

@@ -1,3 +1,6 @@
+import React from 'react'
+import Image from 'next/image'
+
 const collections = [
   {
     title: 'Urban Archive',
@@ -34,12 +37,8 @@ export default function FeaturedCollections() {
               key={collection.title}
               className="group overflow-hidden rounded-[2rem] border border-[#7A5C3E]/20 bg-[#1C1C1C] shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_40px_100px_-40px_rgba(0,0,0,0.9)]"
             >
-              <div className="overflow-hidden">
-                <img
-                  src={collection.image}
-                  alt={collection.title}
-                  className="h-[320px] w-full object-cover transition duration-500 group-hover:scale-105"
-                />
+              <div className="overflow-hidden relative h-[320px] w-full">
+                <Image src={collection.image} alt={collection.title} fill className="object-cover transition duration-500 group-hover:scale-105" unoptimized />
               </div>
               <div className="space-y-4 p-6">
                 <span className="inline-flex rounded-full bg-[#C9A227]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-[#C9A227]">
@@ -47,6 +46,7 @@ export default function FeaturedCollections() {
                 </span>
                 <h3 className="text-2xl font-semibold text-[#F5F5F5]">{collection.title}</h3>
                 <p className="text-sm leading-7 text-[#D9D0A7]">{collection.description}</p>
+                
                 <a
                   href="#trending"
                   className="inline-flex rounded-full border border-[#C9A227]/30 bg-[#C9A227]/10 px-5 py-3 text-sm font-semibold text-[#C9A227] transition duration-300 hover:bg-[#C9A227] hover:text-[#111111]"

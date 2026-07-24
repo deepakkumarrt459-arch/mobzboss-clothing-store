@@ -19,7 +19,7 @@ export function useOrders() {
   }
 
   useEffect(() => {
-    void loadOrders()
+    void Promise.resolve().then(loadOrders)
   }, [])
 
   return {

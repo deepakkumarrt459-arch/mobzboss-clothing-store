@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 import { Product } from '@/types/product'
 import useProducts from '@/hooks/useProducts'
+import Image from 'next/image'
 
 export default function TrendingProducts() {
   const { products, loading } = useProducts()
@@ -34,17 +35,15 @@ export default function TrendingProducts() {
           ) : trendingProducts.length === 0 ? (
             <div className="col-span-full rounded-[2rem] border border-[#7A5C3E]/15 bg-[#111111]/95 p-12 text-center text-[#D9D0A7]">No products available.</div>
           ) : (
-            trendingProducts.map((product) => (
+            trendingProducts.map((product: Product) => (
               <article
                 key={product.id}
                 className="group overflow-hidden rounded-[2rem] border border-[#7A5C3E]/15 bg-[#111111]/95 shadow-[0_30px_70px_-40px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_40px_90px_-40px_rgba(0,0,0,0.95)]"
               >
-                <Link href={`/product/${product.id}`} className="overflow-hidden block">
-                  <img
-                    src={product.images?.[0] ?? 'https://placehold.co/400x500/111111/F5F5F5?text=No+Image'}
-                    alt={product.name}
-                    className="h-[380px] w-full object-cover transition duration-500 group-hover:scale-105"
-                  />
+                <Link href={`/product/${product.id}`} className="overflow-hidden block relative">
+                  <div className="relative h-[380px] w-full">
+                    <Image src={product.images?.[0] ?? 'https://placehold.co/400x500/111111/F5F5F5?text=No+Image'} alt={product.name} fill className="object-cover transition duration-500 group-hover:scale-105" unoptimized />
+                  </div>
                 </Link>
                 <div className="space-y-4 p-6">
                   <div className="flex items-center justify-between gap-4">
